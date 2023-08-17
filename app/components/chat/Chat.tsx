@@ -10,20 +10,19 @@ import { selectSubscription } from '@/app/redux';
 
 const url = '/api/homeophaticBot';
 
- export const Chat = () => { 
+ export const Chat = () => {
    const router = useRouter();
   const [messages, setMessages, messageRef] = useState<MessageProps[]>([]);
   const isSubscribed = useSelector(selectSubscription);
   const [loading, setLoading] = useState(false);
   const [counter, setCounter, counterRef] = useState(0);
-  
+
   useEffect(() => {
       if(!isSubscribed){
         router.push('/subscription');
       }
   }, [isSubscribed, router])
-  
-  
+
 //deactivated to save the prompt cost
   // useEffect(() => {
   //   callApi(`you are a homeophatic doctor who has all the information
@@ -38,7 +37,6 @@ const url = '/api/homeophaticBot';
   //   if your are being asked who you then you answer as i dicate you.
   //   you will not give any information about yourslelf, open ai, gpt or anything else beside homeophatic consultant. `)
   // }, [])
-  
 
   const callApi = async (input: string) => {
     setLoading(true);
@@ -50,7 +48,6 @@ const url = '/api/homeophaticBot';
     };
     setMessages([...messageRef.current, myMessage]);
 
-  
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -60,13 +57,13 @@ const url = '/api/homeophaticBot';
         body: JSON.stringify({
           messages: messageRef.current.map(({ key, ...rest }) => rest),
           counter: counterRef.current
-      })      
+      })
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       const data = await response.json();
       setCounter(counterRef.current + 1);
       const botMessage: MessageProps = {
@@ -82,23 +79,18 @@ const url = '/api/homeophaticBot';
       alert('Something went wrong');
     }
   };
-  
-  
 
   return (
     <main className="relative max-w-2xl mx-auto">
       <div className='sticky top-0 w-fll pt-10 px-4'>
       <ChatInput onSend={(input: string) => callApi(input)} disabled={loading || !isSubscribed}/>
       </div>
-      
       <div className='mt-10 px-4'>
-      {messageRef.current.map((msg: MessageProps) => ( msg.key > 1 &&
-  <ChatMessage key={msg.key} content={msg.content} role={msg.role}/>
-))}
+        {messageRef.current.map((msg: MessageProps) => ( msg.key > 1 &&
+          <ChatMessage key={msg.key} content={msg.content} role={msg.role}/>
+        ))}
         {messages.length === 0 && <p className='text-center text-gray-400'>I am at youre service</p>}
       </div>
     </main>
   );
-  };
-
-
+};

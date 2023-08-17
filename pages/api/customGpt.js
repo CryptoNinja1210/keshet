@@ -29,7 +29,7 @@ dotenv.config({path: "./.env.local"});
 
 //initazllize memory
 const memory = new BufferMemory({
-  memoryKey: "chat_history", 
+  memoryKey: "chat_history",
   inputKey: "question", // The key for the input to the chain
   outputKey: "text", // The key for the final conversational output of the chain
   returnMessages: true, // If the chat model should return the messages
@@ -53,24 +53,24 @@ console.log("documents have been loaded successfully")
 
 //efine a function to calculate the cost of tokenizing the documents
 async function calculateCost() {
-    const modelName = "text-embedding-ada-002";
-    const modelKey = models[modelName];
-    const model = await load(registry[modelKey]);
-    const encoder = new Tiktoken(
-      model.bpe_ranks,
-      model.special_tokens,
-      model.pat_str
-    );
-    const tokens = encoder.encode(JSON.stringify(docs));
-    const tokenCount = tokens.length;
-    const ratePerThousandTokens = 0.0004;
-    const cost = (tokenCount / 1000) * ratePerThousandTokens;
-    encoder.free();
-    return cost;
-  }
-  
-  const VECTOR_STORE_PATH = "Documents.index";
-  const question = "what is the most important thing in homeopathy according the docs";
+  const modelName = "text-embedding-ada-002";
+  const modelKey = models[modelName];
+  const model = await load(registry[modelKey]);
+  const encoder = new Tiktoken(
+    model.bpe_ranks,
+    model.special_tokens,
+    model.pat_str
+  );
+  const tokens = encoder.encode(JSON.stringify(docs));
+  const tokenCount = tokens.length;
+  const ratePerThousandTokens = 0.0004;
+  const cost = (tokenCount / 1000) * ratePerThousandTokens;
+  encoder.free();
+  return cost;
+}
+
+const VECTOR_STORE_PATH = "Documents.index";
+const question = "what is the most important thing in homeopathy according the docs";
 
  //Define a function to normalize the content of the documents
 function normalizeDocuments(docs) {
@@ -83,11 +83,10 @@ function normalizeDocuments(docs) {
   });
 }
 
-export default async function handler(res, req)
 
 //main function to run the process
 export const run = async (acceptableCost) => {
-  //init readline to able to use input output in the console 
+  //init readline to able to use input output in the console
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -99,7 +98,7 @@ export const run = async (acceptableCost) => {
   const cost = await calculateCost();
   console.log(cost);
 
-  //choose the range 
+  //choose the range
   if (cost <= acceptableCost) {
 
     const model = new OpenAI({
@@ -140,22 +139,16 @@ export const run = async (acceptableCost) => {
      // 18. Create a retrieval chain using the language model and vector store
      console.log("Creating conversational retrieval chain...");
      const chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), { memory });
-     
      //modify the way you call to the `chain` and handle the chat history.
      let chatHistory = "";
-     
 
-    // loop that lets u chat with the model over the console 
+    // loop that lets u chat with the model over the console
     const ChatLoop = async () => {
       rl.question('Question: ', async (input) => {
         console.log("Querying chain...");
-       
           const res = await chain.call({ question: input, chat_history: chatHistory });
           chatHistory += `\n${input}\n${res.text}`;
           console.log(`Answer: ${res.text}`);
-
-        
-  
         ChatLoop();  // Calling this function again to ask new question.
       });
     };
@@ -167,6 +160,8 @@ export const run = async (acceptableCost) => {
     // 20. If the cost exceeds the limit, skip the embedding process
     console.log(`The cost of embedding exceeds ${acceptableCost}$. Skipping embeddings.`);
   };
-};
-  
-run(3);  
+}
+
+run(3)
+
+// export default async function handler({res, req});

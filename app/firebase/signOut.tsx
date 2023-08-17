@@ -16,7 +16,6 @@ export const SignOutButton = () => {
         signOut(auth);
         console.log(store.getState());
     } catch (error) {
-        
     }
    };
    return (
