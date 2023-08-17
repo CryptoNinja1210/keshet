@@ -87,83 +87,83 @@ export default async function handler(res, req) {
   console.log('end')
 }
 
-//main function to run the process
-export const run = async (acceptableCost) => {
-  //init readline to able to use input output in the console
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+// //main function to run the process
+// export const run = async (acceptableCost) => {
+//   //init readline to able to use input output in the console
+//   const rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+//   });
 
 
-  //calculate the cost
-  console.log("calculatin cost...");
-  const cost = await calculateCost();
-  console.log(cost);
+//   //calculate the cost
+//   console.log("calculatin cost...");
+//   const cost = await calculateCost();
+//   console.log(cost);
 
-  //choose the range
-  if (cost <= acceptableCost) {
+//   //choose the range
+//   if (cost <= acceptableCost) {
 
-    const model = new OpenAI({
-      model: "GPT-3.5 Turbo",
-      openAIApiKey: process.env.OPENAI_API_KEY
-    });
+//     const model = new OpenAI({
+//       model: "GPT-3.5 Turbo",
+//       openAIApiKey: process.env.OPENAI_API_KEY
+//     });
 
-    let vectorStore;
-    // 13. Check if an existing vector store is available
-    console.log("Checking for existing vector store...");
-    if (fs.existsSync(VECTOR_STORE_PATH)) {
-      // 14. Load the existing vector store
-      console.log("Loading existing vector store...");
-      vectorStore = await HNSWLib.load(
-        VECTOR_STORE_PATH,
-        new OpenAIEmbeddings()
-      );
-      console.log("Vector store loaded.");
-    } else {
-      // 15. Create a new vector store if one does not exist
-      console.log("Creating new vector store...");
-      const textSplitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 1000,
-      });
-      const normalizedDocs = normalizeDocuments(docs);
-      const splitDocs = await textSplitter.createDocuments(normalizedDocs);
+//     let vectorStore;
+//     // 13. Check if an existing vector store is available
+//     console.log("Checking for existing vector store...");
+//     if (fs.existsSync(VECTOR_STORE_PATH)) {
+//       // 14. Load the existing vector store
+//       console.log("Loading existing vector store...");
+//       vectorStore = await HNSWLib.load(
+//         VECTOR_STORE_PATH,
+//         new OpenAIEmbeddings()
+//       );
+//       console.log("Vector store loaded.");
+//     } else {
+//       // 15. Create a new vector store if one does not exist
+//       console.log("Creating new vector store...");
+//       const textSplitter = new RecursiveCharacterTextSplitter({
+//         chunkSize: 1000,
+//       });
+//       const normalizedDocs = normalizeDocuments(docs);
+//       const splitDocs = await textSplitter.createDocuments(normalizedDocs);
 
-      // 16. Generate the vector store from the documents
-      vectorStore = await HNSWLib.fromDocuments(
-        splitDocs,
-        new OpenAIEmbeddings()
-      );
-      // 17. Save the vector store to the specified path
-      await vectorStore.save(VECTOR_STORE_PATH);
+//       // 16. Generate the vector store from the documents
+//       vectorStore = await HNSWLib.fromDocuments(
+//         splitDocs,
+//         new OpenAIEmbeddings()
+//       );
+//       // 17. Save the vector store to the specified path
+//       await vectorStore.save(VECTOR_STORE_PATH);
 
-      console.log("Vector store created.");
-    };
-     // 18. Create a retrieval chain using the language model and vector store
-     console.log("Creating conversational retrieval chain...");
-     const chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), { memory });
-     //modify the way you call to the `chain` and handle the chat history.
-     let chatHistory = "";
+//       console.log("Vector store created.");
+//     };
+//      // 18. Create a retrieval chain using the language model and vector store
+//      console.log("Creating conversational retrieval chain...");
+//      const chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), { memory });
+//      //modify the way you call to the `chain` and handle the chat history.
+//      let chatHistory = "";
 
-    // loop that lets u chat with the model over the console
-    const ChatLoop = async () => {
-      rl.question('Question: ', async (input) => {
-        console.log("Querying chain...");
-          const res = await chain.call({ question: input, chat_history: chatHistory });
-          chatHistory += `\n${input}\n${res.text}`;
-          console.log(`Answer: ${res.text}`);
+//     // loop that lets u chat with the model over the console
+//     const ChatLoop = async () => {
+//       rl.question('Question: ', async (input) => {
+//         console.log("Querying chain...");
+//           const res = await chain.call({ question: input, chat_history: chatHistory });
+//           chatHistory += `\n${input}\n${res.text}`;
+//           console.log(`Answer: ${res.text}`);
 
-        ChatLoop();  // Calling this function again to ask new question.
-      });
-    };
+//         ChatLoop();  // Calling this function again to ask new question.
+//       });
+//     };
 
-     ChatLoop();
+//      ChatLoop();
 
-  } else {
+//   } else {
 
-    // 20. If the cost exceeds the limit, skip the embedding process
-    console.log(`The cost of embedding exceeds ${acceptableCost}$. Skipping embeddings.`);
-  };
-};
+//     // 20. If the cost exceeds the limit, skip the embedding process
+//     console.log(`The cost of embedding exceeds ${acceptableCost}$. Skipping embeddings.`);
+//   };
+// };
 
-run(3);
+// run(3);
