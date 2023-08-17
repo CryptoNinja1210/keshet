@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
@@ -32,7 +33,6 @@ export const Navbar = () => {
         ) : <SignInButton/>}
     </nav>
     </header>
-    
   );
 };
 

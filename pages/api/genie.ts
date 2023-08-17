@@ -34,14 +34,11 @@
         req: GenerateNextApiRequest,
         res: NextApiResponse<ResponseData>
     ) {
-       
         const { messages, counter } = req.body;
-        
         if (counter > maxAllowedRequests) {
             res.status(429).json({ text: "You have exceeded the maximum number of requests" });
             return;
           }
-        
 
         const completion = await openai.createChatCompletion({
             model: "gpt-3.5-turbo",

@@ -55,10 +55,9 @@ interface Document {
   pageContent: string | string[];
 }
 
-  
 //initazllize memory
 const memory = new BufferMemory({
-  memoryKey: "chat_history", 
+  memoryKey: "chat_history",
   inputKey: "question", // The key for the input to the chain
   outputKey: "text", // The key for the final conversational output of the chain
   returnMessages: true, // If the chat model should return the messages
@@ -89,10 +88,8 @@ async function calculateCost(): Promise<number> {
     interface Registry {
       [key: string]: any;
     }
-    
     const modelRegistry: Registry = registry;
     const model = await load(modelRegistry[modelKey]) as calculationModel;
-    
     const encoder = new Tiktoken(
       model.bpe_ranks,
       model.special_tokens,
@@ -120,10 +117,9 @@ function normalizeDocuments(docs: Document[]): string[] {
       throw new Error(`Unexpected doc.pageContent type: ${typeof doc.pageContent}`);
     });
   }
-  
+
   const maxAllowedRequests = 17;
 
-  
   export default async function handler(
   req: GenerateNextApiRequest,
   res: NextApiResponse<ResponseData>) {
@@ -148,7 +144,7 @@ const docs = await docsPromise;
   console.log(cost);
   const acceptableCost = 3;
 
-  //choose the range 
+  //choose the range
   if (cost <= acceptableCost) {
     // rest of the code
     const model = new OpenAI({
@@ -196,10 +192,8 @@ const docs = await docsPromise;
 
      const result = await chain.call({ question: messages[messages.length -1].content, chat_history: chatHistory });
      return result;
-          
     } else {
     // 20. If the cost exceeds the limit, skip the embedding process
     console.log(`The cost of embedding exceeds ${acceptableCost}$. Skipping embeddings.`);
   };
 };
-  
